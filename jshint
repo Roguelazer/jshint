@@ -5,6 +5,10 @@
 #
 # TODO: auto-detect the node jshint frontend
 #
+
+# change this if you're installing to a non-standard location. for testing
+# and such, run jshint with -t to try and deduce the path from the location
+# of this script
 root="/usr/share/jshint"
 
 jsopts="{}"
