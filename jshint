@@ -9,6 +9,8 @@
 # change this if you're installing to a non-standard location. for testing
 # and such, run jshint with -t to try and deduce the path from the location
 # of this script
+set -x
+
 root="/usr/share/jshint"
 
 jsopts="{}"
@@ -92,9 +94,9 @@ getOpts() {
 	done
 }
 
-jsc() {
-	interpreter="$1"
-	dodashdash="$2"
+run_js() {
+	style="$1"
+	interpreter="$2"
 
 	oldifs="$IFS"
 	IFS=`echo -en "\n\b"`
@@ -103,11 +105,8 @@ jsc() {
 			# restore the IFS because bourne shell under os x and some other
 			# lame shells use it for evaluating command-lines
 			IFS="$oldifs"
-			# Fun fact: jsc under OS X requires a -- before its arguments,
-			# but smjs dies with a -- before its arguments. Isn't argument
-			# parsing fun?
-			if [ "$dodashdash" = "1" ] ; then
-				cat "$file" | "$interpreter" $root/env/jsc.js -- "$root/jshint.js" "$jsopts" "$file"
+			if [ "$style" = "jsc" ] ; then
+				( cat "$file" ; echo "EOF***" ) | "$interpreter" -- $root/env/jsc.js "$root/jshint.js" "$jsopts" "$file"
 			else
 				cat "$file" | "$interpreter" $root/env/jsc.js "$root/jshint.js" "$jsopts" "$file"
 			fi
@@ -119,6 +118,7 @@ jsc() {
 	IFS="$oldifs"
 }
 
+
 main() {
 	getOpts "$@"
 
@@ -129,13 +129,13 @@ main() {
 	if quiet which d8; then
 		d8 "$root"/env/d8.js -- "$jsopts" "$files"
 	elif quiet which smjs; then
-		jsc smjs
+		run_js smjs smjs
 	elif quiet which jsc; then
-		jsc jsc
+		run_js jsc jsc
 	elif [ -e /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc ]; then
 		# jsc under modern OS X doesn't seem to support command-line
 		# arguments, so this probably won't work
-		jsc /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc 1
+		run_js jsc /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc
 	else
 		echo "Could not find any supported JavaScript environment. Looked for: d8 jsc smjs" >&2
 		exit 1
