@@ -93,9 +93,9 @@ run_js() {
 	for file in "${files[@]}" ; do
 		if [ -r "$file" ]; then
 			if [ "$style" = "jsc" ] ; then
-				( cat "$file" ; echo "EOF***" ) | "$interpreter" -- $root/env/jsc.js "$root/jshint.js" "$jsopts" "$file"
+				( cat "$file" ; echo "EOF***" ) | "$interpreter" "$root/env/jsc.js" -- "$root/jshint.js" "$jsopts" "$file"
 			else
-				cat "$file" | "$interpreter" $root/env/jsc.js "$root/jshint.js" "$jsopts" "$file"
+				cat "$file" | "$interpreter" "$root/env/jsc.js" "$root/jshint.js" "$jsopts" "$file"
 			fi
 		else
 			echo "Error while reading: '$file'"
